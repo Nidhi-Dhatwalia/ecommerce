@@ -6,13 +6,10 @@
         <v-icon>mdi-filter</v-icon>
       </v-btn>
 
-      <router-link to="/" class="back-btn-link">
-        <v-btn color="primary">
-          <v-icon>mdi-arrow-left</v-icon> Back
-        </v-btn>
+      <router-link to="/dashboard" class="back-btn-link">
+        <v-btn color="primary"> <v-icon>mdi-arrow-left</v-icon> Back </v-btn>
       </router-link>
     </h2>
-
 
     <v-list v-if="showFilterMenu" class="filter-list">
       <v-list-item
@@ -25,7 +22,6 @@
       </v-list-item>
     </v-list>
 
-  
     <v-progress-circular
       v-if="loading"
       indeterminate
@@ -34,7 +30,6 @@
       class="loading-spinner"
     ></v-progress-circular>
 
- 
     <v-row v-if="bestDeals.length > 0" class="product-grid">
       <v-col
         v-for="(product, index) in bestDeals"
@@ -48,7 +43,8 @@
             contain
             alt="Product Image"
             class="product-image"
-          ></v-img>
+          />
+         
           <v-card-text class="product-card-text">
             <p class="product-name">{{ product.title }}</p>
             <p class="product-category">{{ product.category }}</p>
@@ -65,8 +61,8 @@
             </router-link>
 
             <v-btn
-              color="secondary"
               class="add-to-cart-button"
+              :color="isProductInCart(product) ? 'red' : 'secondary'"
               @click="addToCart(product)"
             >
               Add to Cart
@@ -76,13 +72,13 @@
       </v-col>
     </v-row>
 
- 
     <div v-if="bestDeals.length === 0 && !loading" class="no-products">
       <p>No products found for this category.</p>
       <v-btn color="primary" @click="fetchBestDeals()">Reload</v-btn>
     </div>
   </v-container>
 </template>
+
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -136,20 +132,24 @@ const selectCategory = (category) => {
 };
 
 const visitProduct = (productId) => {
-  router.push("/product-detail/${productId}");
+  router.push(`/product-detail/${productId}`);
 };
 
+const isProductInCart = (product) => {
+  return cartStore.cart.some((item) => item.id === product.id);
+};
 
+ 
 const addToCart = (product) => {
-  cartStore.addToCart(product);
+  if (!isProductInCart(product)) {
+    cartStore.addToCart(product);  
+  }
 };
 
 onMounted(() => {
   fetchBestDeals();
 });
 </script>
-
-
 
 <style scoped>
 .container {

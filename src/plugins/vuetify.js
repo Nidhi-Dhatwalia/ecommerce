@@ -1,6 +1,7 @@
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
+// src/plugins/vuetify.js
+import { createVuetify } from 'vuetify';
+import 'vuetify/styles';  // Global styles
 
-const vuetify = createVuetify()
+const vuetify = createVuetify();  // Initialize Vuetify
 
-export default vuetify
+export default vuetify;

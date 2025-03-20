@@ -1,59 +1,70 @@
 <template>
-  <div class="login-container">
-    <v-sheet class="login-form" elevation="4">
-      <h1>Log In To Your Account</h1>
-      <v-form ref="form" v-model="isValid">
-        <v-text-field
-          v-model="emailAddress"
-          :rules="emailRules"
-          prepend-inner-icon="mdi-email-outline"
-          label="Email Address"
-          required
-          class="input-field"
-        />
-        <v-text-field
-          v-model="password"
-          prepend-inner-icon="mdi-lock-outline"
-          :rules="passwordRules"
-          label="Password"
-          type="password"
-          required
-          class="input-field"
-        />
-        
-        <div class="forgot-password">
-          Forget Password? <a href="#">Click Here</a>
-        </div>
-        
-        <v-btn
-          @click="handleSubmit"
-          class="login-btn"
-          type="submit"
-          color="primary"
-          block
-        >
-          Log In
-        </v-btn>
+  <v-container class="login-container" fluid>
+    <v-row justify="center" align="center" class="min-height-100vh">
+      <v-col cols="12" sm="8" md="4">
+        <v-card class="login-card">
+          <v-card-title class="login-card-title">Login</v-card-title>
+          <v-sheet class="login-sheet">
+            <v-form ref="form" v-model="isValid">
+              <v-text-field
+                v-model="username"
+                :rules="usernameRules"
+                prepend-inner-icon="mdi-account-outline"
+                label="Username"
+                required
+                class="input-field"
+              />
+              <v-text-field
+                v-model="password"
+                prepend-inner-icon="mdi-lock-outline"
+                :rules="passwordRules"
+                label="Password"
+                type="password"
+                required
+                class="input-field"
+              />
 
-        <div class="sign-up-link">
-          Don't have an account? <a @click="signUp" href="#">Sign Up</a>
-        </div>
-      </v-form>
-    </v-sheet>
-  </div>
+              <div class="forgot-password text-center">
+                Forget Password? <a href="#">Click Here</a>
+              </div>
+<br>
+              <v-btn
+                @click="handleSubmit"
+                class="login-btn"
+                type="submit"
+                color="black"
+                block
+              >
+                Log In
+              </v-btn> <br>
+              <v-btn
+                @click="signUp"
+                class="signup-btn"
+                type="submit"
+                color="blue"
+                size="large"
+                variant="tonal"
+                block
+              > 
+                Sign Up
+              </v-btn>
+            </v-form>
+          </v-sheet>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
-
 <script>
 export default {
-  name: "loginPage",
   data() {
     return {
-      emailAddress: "",
+      username: "",
       password: "",
       isValid: false,
-      emailRules: [
-        (inputValue) => !!inputValue || "Email is required",
-        (inputValue) => /.+@.+\..+/.test(inputValue) || "Enter a valid email",
+      usernameRules: [
+        (inputValue) => !!inputValue || "Username is required",
+        (inputValue) => inputValue.length >= 3 || "Username must be at least 3 characters",
       ],
       passwordRules: [
         (inputValue) => !!inputValue || "Password is required",
@@ -64,118 +75,105 @@ export default {
   },
   methods: {
     handleSubmit() {
-      // Validate the form
       this.$refs.form.validate();
+
       if (!this.isValid) {
         console.log("Please fill in all fields correctly.");
         return;
       }
-
-      const loginData = {
-        username: this.emailAddress,
-        password: this.password,
-        expiresInMins: 30,
-      };
-
-      fetch("https://dummyjson.com/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
-        credentials: "include",
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.token) {
-            console.log("Login successful, token:", data.token);
-            this.$router.push({ name: "dashboard" });
-          } else {
-            console.log("Login failed:", data.message || "Unknown error");
-          }
-        })
-        .catch((error) => {
-          console.error("Error during login:", error);
-        });
+      this.$router.push("/dashboard");  
     },
-
     signUp() {
-      this.$router.push({ name: "sign-up" });
+      this.$router.push("/signup");  
     },
   },
 };
 </script>
 
+
+
 <style scoped>
+ 
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #ecf0f1;
-  padding: 0 20px;
+  max-width: 1400px;
+  margin-top: 50px;
 }
 
-.login-form {
-  padding: 40px;
-  max-width: 400px;
-  width: 100%;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+.min-height-100vh {
+  min-height: 100vh;
 }
 
-h1 {
+
+.login-card {
+  background-color: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.login-card-title {
+  font-size: 2rem;
+  color: #080808;
+  font-weight: bold;
   text-align: center;
-  color: #34495e;
-  font-size: 24px;
-  margin-bottom: 30px;
 }
+
+
+.login-sheet {
+  padding: 25px;
+  background-color: #ffffff;
+  max-width: 500px;
+  width: 100%;
+}
+
 
 .input-field {
   margin-bottom: 20px;
+  background-color: #f8f8f8;
 }
 
+.input-field input {
+  padding: 12px;
+}
+
+ 
 .forgot-password {
-  text-align: center;
-  margin-top: 10px;
   font-size: 14px;
+  color: rgb(90, 89, 89);
+  margin-top: 12px;
 }
 
 .forgot-password a {
-  color: #3498db;
   text-decoration: none;
+  color: #007bff;
 }
 
 .forgot-password a:hover {
   text-decoration: underline;
-}
-
-.login-btn {
-  margin-top: 20px;
   font-weight: bold;
-  font-size: 16px;
-  background-color: #3498db;
+}
+
+ 
+.login-btn,
+.signup-btn {
   color: white;
-  border-radius: 6px;
-  letter-spacing: 1px;
-  transition: background-color 0.3s;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.login-btn:hover {
-  background-color: #2980b9;
+.login-btn:hover { 
+  transform: scale(1.05);
 }
 
-.sign-up-link {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
+.signup-btn:hover {
+  background-color: #f9fdff;  
+  transform: scale(1.05);
 }
 
-.sign-up-link a {
-  color: #3498db;
-  text-decoration: none;
-}
+ 
 
-.sign-up-link a:hover {
-  text-decoration: underline;
-}
+ 
 </style>

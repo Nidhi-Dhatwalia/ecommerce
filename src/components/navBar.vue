@@ -1,9 +1,11 @@
 <template>
   <div class="container">
+  
     <v-toolbar flat class="toolbar">
       <v-toolbar-title class="title">E-Commerce</v-toolbar-title>
       <v-spacer></v-spacer>
 
+    
       <v-text-field
         v-model="searchQuery"
         label="Search for products"
@@ -21,18 +23,19 @@
         size="18"
       ></v-progress-circular>
 
-      <v-avatar color="info" class="avatar">
-        <v-icon>mdi-account-circle</v-icon>
-      </v-avatar>
+      
+      <v-btn icon @click="logout" class="avatar-btn">
+        <v-avatar color="info" class="avatar">
+          <v-icon>mdi-account-circle</v-icon>
+        </v-avatar>
+      </v-btn>
 
-      <router-link to="/login">
-        <v-btn icon class="icon-btn">Login</v-btn>
-      </router-link>
-
+    
       <v-btn icon class="icon-btn">
         <v-icon>mdi-heart</v-icon>
       </v-btn>
 
+   
       <router-link to="/cart">
         <v-btn icon class="icon-btn">
           <v-badge color="red" :content="cartStore.cart.length" overlap>
@@ -41,6 +44,7 @@
         </v-btn>
       </router-link>
     </v-toolbar>
+ 
     <v-list v-if="products.length > 0" class="product-dropdown">
       <v-list-item
         v-for="(product, index) in products"
@@ -59,12 +63,16 @@
 import { ref } from "vue";
 import { useCartStore } from "../stores/cartStore";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
+ 
 const cartStore = useCartStore();
 const searchQuery = ref("");
 const loading = ref(false);
 const products = ref([]);
+const router = useRouter();
 
+ 
 const searchProducts = async () => {
   if (!searchQuery.value) {
     products.value = [];
@@ -83,10 +91,16 @@ const searchProducts = async () => {
     loading.value = false;
   }
 };
-
+ 
 const selectProduct = (title) => {
   searchQuery.value = title;
-  products.value = [];
+  products.value = [];   
+};
+
+ 
+const logout = () => {
+  localStorage.removeItem("authToken");  
+  router.push("/");  
 };
 </script>
 
@@ -94,7 +108,7 @@ const selectProduct = (title) => {
 .container {
   margin: 0;
 }
-
+ 
 .toolbar {
   background-color: #272727;
   color: white;
@@ -109,6 +123,7 @@ const selectProduct = (title) => {
   color: white;
 }
 
+ 
 .input-style {
   border-radius: 25px;
   width: 350px;
@@ -123,10 +138,7 @@ const selectProduct = (title) => {
   z-index: 2;
 }
 
-.input-style .v-input__control {
-  padding-bottom: 0;
-}
-
+ 
 .product-dropdown {
   max-height: 300px;
   overflow-y: auto;
@@ -135,13 +147,15 @@ const selectProduct = (title) => {
   margin-top: 8px;
   background-color: white;
   position: fixed;
-  top: 38%;
+  top: 28%;
   left: 61%;
   transform: translate(-50%, -50%);
   width: 600px;
   z-index: 10;
+  border-radius: 12px;
 }
 
+ 
 .product-dropdown .v-list-item {
   padding: 8px 16px;
 }
@@ -151,12 +165,13 @@ const selectProduct = (title) => {
   color: #333;
 }
 
-.product-dropdown .v-list-item-subtitle {
-  color: #888;
-}
-
+ 
 .avatar {
   margin-left: 20px;
+}
+
+.avatar-btn {
+  margin-left: 16px;
 }
 
 .icon-btn {

@@ -2,17 +2,21 @@
   <div class="payment-container">
     <h1 class="payment-title">Secure Payment</h1>
 
+ 
     <form @submit.prevent="handleSubmit" class="payment-form">
+ 
       <div class="input-field">
         <label for="cardholder-name">Cardholder Name</label>
         <input type="text" id="cardholder-name" v-model="cardholderName" required />
       </div>
 
+ 
       <div class="input-field">
         <label for="email">Email</label>
         <input type="email" id="email" v-model="email" required />
       </div>
 
+     
       <div class="input-field">
         <label for="country">Country</label>
         <select id="country" v-model="country" required>
@@ -23,6 +27,7 @@
         </select>
       </div>
 
+  
       <div class="input-field">
         <label for="card-number">Card Number</label>
         <input type="text" id="card-number" v-model="cardNumber" placeholder="XXXX XXXX XXXX XXXX" required />
@@ -38,71 +43,73 @@
         <input type="text" id="cvv" v-model="cvv" placeholder="XXX" required />
       </div>
 
+ 
       <button type="submit" :disabled="loading" class="submit-btn">Pay Now</button>
     </form>
 
+    
     <div v-if="error" class="error">{{ error }}</div>
 
+ 
     <div v-if="loading" class="loading">
       <span class="spinner"></span> Processing...
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+<script>
+export default {
+  data() {
+    return {
+      cardholderName: '',
+      email: '',
+      country: '',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: '',
+      loading: false,
+      error: null,
+    };
+  },
 
-const router = useRouter();
-
-const cardholderName = ref('');
-const email = ref('');
-const country = ref('');
-const cardNumber = ref('');
-const expiryDate = ref('');
-const cvv = ref('');
-const loading = ref(false);
-const error = ref(null);
-
-const handleSubmit = async () => {
-  loading.value = true;
-  error.value = null;
-
-  // Check if all fields are filled
-  if (!cardholderName.value || !email.value || !country.value || !cardNumber.value || !expiryDate.value || !cvv.value) {
-    error.value = 'Please fill in all fields.';
-    loading.value = false;
-    return;
-  }
-
-  try {
-    // Simulate processing time and then navigate to confirmation page
-    setTimeout(() => {
-      loading.value = false;
-
-      // Redirect to the confirmation page
-      router.push({
-        name: 'PaymentConfirmation', // Adjust the route name based on your router setup
-        params: {
-          productName: 'Sample Product',
-          productPrice: 1999, // Example price
-          trackingNumber: 'AB1234567890', // Example tracking number
-        },
-      });
-    }, 2000);
-  } catch (err) {
-    error.value = 'Payment failed. Please try again.';
-    loading.value = false;
-  }
+  methods: {
+    async handleSubmit() {
+      this.loading = true;
+      this.error = null;
+ 
+      if (!this.cardholderName || !this.email || !this.country || !this.cardNumber || !this.expiryDate || !this.cvv) {
+        this.error = 'Please fill in all fields.';
+        this.loading = false;
+        return;
+      }
+ 
+      try { 
+        setTimeout(() => {
+          this.loading = false;
+ 
+          this.$router.push({
+            name: 'PaymentConfirmation',  
+          });
+        }, 2000);
+      } catch (err) {
+        this.error = 'Payment failed. Please try again.';
+        this.loading = false;
+      }
+    },
+  },
 };
 </script>
 
+ 
+ 
+
 <style scoped>
+ 
 .payment-container {
-  width: 100%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 500px;
   margin: 0 auto;
-  padding: 40px;
+  padding: 30px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);

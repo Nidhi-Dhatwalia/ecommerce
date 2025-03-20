@@ -4,4 +4,5 @@ import Vuetify from 'vite-plugin-vuetify'
 
 export default defineConfig({
   plugins: [vue(), Vuetify()],
+ 
 })

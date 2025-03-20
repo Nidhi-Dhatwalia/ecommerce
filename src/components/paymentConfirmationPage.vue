@@ -5,24 +5,17 @@
     <div class="confirmation-details">
       <p><strong>Product Name:</strong> {{ productName }}</p>
       <p><strong>Price:</strong> ${{ (productPrice / 100).toFixed(2) }}</p>
-      <p><strong>Tracking Number:</strong> {{ shippingInformation }}</p>
+      <p><strong>Tracking Number:</strong> {{ trackingNumber }}</p>
     </div>
 
     <router-link to="/">Go to Home</router-link>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    productName: String,
-    productPrice: Number,
-    trackingNumber: String,
-  },
-};
-</script>
+ 
 
-<style scoped> 
+<style scoped>
+
 .confirmation-container {
   padding: 40px;
   max-width: 600px;

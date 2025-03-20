@@ -1,9 +1,9 @@
 <template>
   <v-container class="container">
-    <h2 class="heading">Best Deals</h2>
+    <h2 class="text-h4 font-weight-bold mb-4">Best Deals</h2>
     <v-slide-group show-arrows>
       <v-slide-group-item v-for="(product, index) in bestDeals" :key="index">
-        <v-card class="product-card" elevation="2">
+        <v-card class="mx-3 product-card" elevation="2">
           <v-chip class="best-deal-badge" label small>Best Deal</v-chip>
           <v-card-text>
             <v-img
@@ -48,7 +48,7 @@
       </v-slide-group-item>
     </v-slide-group>
 
-    <div class="text-center">
+    <div class="text-center mt-4">
       <router-link to="/explore">
         <v-btn color="red" class="shop-btn" dark> Explore More </v-btn>
       </router-link>
@@ -68,37 +68,39 @@ const fetchBestDeals = async () => {
   try {
     const response = await axios.get("https://dummyjson.com/products");
     bestDeals.value = response.data.products.map((product) => ({
+      id: product.id,   
       title: product.title,
       category: product.category,
       image: product.images,
       price: product.price,
       discountPercentage: product.discountPercentage,
       quantity: 1, // Default quantity
-      isInCart: false, // Track if product is in the cart
+      isInCart: cartStore.cart.some(item => item.id === product.id), // Check if product is in cart
     }));
   } catch (error) {
     console.error("Error fetching best deals:", error);
   }
 };
 
-onMounted(fetchBestDeals); 
-
-
+onMounted(fetchBestDeals);
+ 
 const toggleCart = (product, index) => {
   if (!product.isInCart) { 
     cartStore.addToCart(product);
-    bestDeals.value[index].isInCart = true;  
-  } else { 
+    bestDeals.value[index].isInCart = true; // Mark as added
+  } else {
+    // Remove the product from the cart
     cartStore.removeFromCart(product);
-    bestDeals.value[index].isInCart = false;  
+    bestDeals.value[index].isInCart = false; // Mark as not added
   }
 };
 
+ 
 const increaseQuantity = (index) => {
   bestDeals.value[index].quantity++;
 };
 
- 
+// Decrease quantity of the product
 const decreaseQuantity = (index) => {
   if (bestDeals.value[index].quantity > 1) {
     bestDeals.value[index].quantity--;
@@ -115,7 +117,7 @@ const decreaseQuantity = (index) => {
   width: 100%;
 }
 
-.heading {
+.text-h4 {
   font-size: 1.75rem;
   color: #333;
   display: flex;
@@ -154,7 +156,7 @@ const decreaseQuantity = (index) => {
   object-fit: cover;
 }
 
- 
+
 .product-name {
   font-size: 1.1rem;
   font-weight: 500;
@@ -162,14 +164,14 @@ const decreaseQuantity = (index) => {
   color: #333;
 }
 
- 
+
 .product-category {
   font-size: 0.9rem;
   color: #888;
   margin-bottom: 5px;
 }
 
- 
+
 .product-price {
   display: flex;
   align-items: center;
@@ -183,7 +185,7 @@ const decreaseQuantity = (index) => {
   margin-left: 5px;
 }
 
- 
+
 .quantity-selector {
   display: flex;
   justify-content: center;
@@ -204,7 +206,7 @@ const decreaseQuantity = (index) => {
   font-size: 1rem;
 }
 
- 
+
 .add-to-cart {
   background-color: #4caf50;
   color: white;
@@ -218,7 +220,6 @@ const decreaseQuantity = (index) => {
   background-color: #388e3c;
 }
 
- 
 .shop-btn {
   width: 200px;
   font-weight: bold;

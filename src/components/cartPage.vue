@@ -1,23 +1,45 @@
 <template>
   <v-container class="container">
     <div class="cart-wrapper">
-      <h2 class="text-h4 font-weight-bold mb-4">Your Cart  
-        <router-link to="/"> 
-          <v-btn color="primary"> Back </v-btn>
-        </router-link> 
+      <h2 class="heading">
+        Your Cart
+        <router-link to="/dashboard">
+          <v-btn color="primary" class="back-btn">
+            <v-icon>mdi-arrow-left</v-icon> Back
+          </v-btn>
+        </router-link>
       </h2>
 
       <v-row v-if="cart.length > 0" class="cart-items">
-        <v-col cols="12" sm="6" md="4" lg="3" v-for="(item, index) in cart" :key="index">
+        <v-col
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+          v-for="(item, index) in cart"
+          :key="index"
+        >
           <v-card class="product-card" elevation="3">
-            <v-img :src="item.image?.[0]" height="200px" contain class="product-image"></v-img>
+            <v-img
+              :src="item.images?.[0]"
+              height="200px"
+              contain
+              class="product-image"
+            />
+
             <v-card-text>
               <p class="product-name">{{ item.title }}</p>
               <p class="product-price">${{ item.price }}</p>
               <p class="quantity">Quantity: {{ item.quantity }}</p>
             </v-card-text>
 
-            <v-btn @click="removeFromCart(index)" block class="remove-from-cart-btn" color="black" dark>
+            <v-btn
+              @click="removeFromCart(item)"
+              block
+              class="remove-from-cart-btn"
+              color="black"
+              dark
+            >
               Remove from Cart
             </v-btn>
           </v-card>
@@ -29,68 +51,80 @@
           <strong>Total Products:</strong> {{ totalProducts }}
         </div>
         <div class="cart-summary-item">
-          <strong>Total Cost:</strong> ₹{{ totalCostInRupees.toFixed(2) }}
+          <strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}
         </div>
 
-        <v-btn color="red" @click="clearCart" class="shop-btn" dark>Clear Cart</v-btn>
+        <v-btn color="red" @click="clearCart" class="shop-btn" dark>
+          Clear Cart
+        </v-btn>
 
         <router-link to="/explore">
-          <v-btn class="shop-btn continue-shopping-btn" color="blue" dark>
+          <v-btn class="continue-shopping-btn" color="blue" dark>
             Continue Shopping
           </v-btn>
         </router-link>
 
-        <router-link to="/payment">
-          <v-btn 
+        <router-link :to="{ name: 'paymentPage', state: { cartItems: cart } }">
+          <v-btn
             v-if="cart.length > 0"
-            class="shop-btn proceed-to-payment-btn"
+            class="proceed-to-payment-btn"
             color="green"
             dark
           >
             Proceed to Payment
           </v-btn>
         </router-link>
+      </div>
 
+      <div v-else class="empty-cart-message">
+        <p class="paragraph-style">Your cart is empty</p>
+        <router-link to="/explore">
+          <v-btn color="primary" class="shop-here-btn">Shop Here</v-btn>
+        </router-link>
       </div>
     </div>
   </v-container>
 </template>
 
 <script setup>
-import { useCartStore } from '../stores/cartStore';
-import { computed } from 'vue';
-
-const exchangeRate = 82;
+import { useCartStore } from "../stores/cartStore";
+import { computed, watch } from "vue";
 
 const cartStore = useCartStore();
-const cart = cartStore.cart;
+const cart = computed(() => cartStore.cart);
+
+watch(
+  cart,
+  (newCart) => {
+    console.log("Cart has been updated in the first component", newCart);
+  },
+  { deep: true }
+);
+
+const removeFromCart = (product) => {
+  cartStore.removeFromCart(product);
+};
 
 const clearCart = () => {
-  console.log("Clear cart triggered");
   cartStore.clearCart();
 };
 
-const removeFromCart = (index) => {
-  console.log('Removing item at index:', index);
-  cartStore.removeFromCart(index);
-};
-
 const totalProducts = computed(() => {
-  return cart.reduce((total, item) => total + item.quantity, 0);
+  return cart.value.reduce((total, item) => total + item.quantity, 0);
 });
 
 const totalCost = computed(() => {
-  return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-});
-
-const totalCostInRupees = computed(() => {
-  return totalCost.value * exchangeRate;
+  return cart.value.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
 });
 </script>
 
+
 <style scoped>
 .container {
-  padding: 0;
+  padding: 0 16px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -101,11 +135,19 @@ const totalCostInRupees = computed(() => {
   padding: 20px;
 }
 
-.text-h4 {
-  font-size: 2rem;
+.heading {
+  font-size: 2.2rem;
   color: #333;
   margin-bottom: 30px;
   text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+}
+
+.back-btn {
+  font-weight: bold;
 }
 
 .cart-items {
@@ -119,7 +161,7 @@ const totalCostInRupees = computed(() => {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -127,6 +169,7 @@ const totalCostInRupees = computed(() => {
 
 .product-card:hover {
   transform: scale(1.05);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
 }
 
 .product-image {
@@ -135,7 +178,7 @@ const totalCostInRupees = computed(() => {
 }
 
 .product-name {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 500;
   margin-top: 15px;
   color: #333;
@@ -143,15 +186,15 @@ const totalCostInRupees = computed(() => {
 }
 
 .product-price {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  color: #1976D2;
+  color: #1976d2;
   text-align: center;
 }
 
 .quantity {
   margin-top: 8px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: #555;
   text-align: center;
 }
@@ -166,19 +209,34 @@ const totalCostInRupees = computed(() => {
   transition: background-color 0.3s ease;
 }
 
+.paragraph-style {
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+}
+
 .shop-btn:hover {
   background-color: #1976d2;
 }
 
 .continue-shopping-btn {
+  font-size: 1.1rem;
   margin-top: 15px;
+  width: 100%;
 }
 
 .proceed-to-payment-btn {
   background-color: #28a745;
   color: white;
+  width: 100%;
+  font-size: 1.1rem;
   margin-top: 15px;
   border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.proceed-to-payment-btn:hover {
+  background-color: #218838;
 }
 
 .remove-from-cart-btn {
@@ -213,7 +271,20 @@ const totalCostInRupees = computed(() => {
   font-weight: bold;
 }
 
-.cart-summary-item strong {
-  color: #1976D2;
+.empty-cart-message {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.shop-here-btn {
+  margin-top: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+}
+
+.shop-here-btn:hover {
+  background-color: #1976d2;
 }
 </style>
