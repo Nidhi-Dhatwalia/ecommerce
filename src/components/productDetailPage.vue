@@ -3,18 +3,16 @@
     <v-row>
       <v-col cols="12" md="6">
         <v-card>
-          <v-img
-  :src="product.images[0] "
-  height="400px"
-  alt="Product Image"
-/>
+          <v-img :src="product.images[0]" height="400px" alt="Product Image" />
         </v-card>
       </v-col>
 
       <v-col cols="12" md="6">
         <v-card class="product-detail-card">
           <v-card-title class="product-title">{{ product.title }}</v-card-title>
-          <v-card-subtitle class="product-category">{{ product.category }}</v-card-subtitle>
+          <v-card-subtitle class="product-category">{{
+            product.category
+          }}</v-card-subtitle>
           <v-card-text>
             <p><strong>Price:</strong> ${{ product.price }}</p>
             <p><strong>Rating:</strong> {{ product.rating }} ★</p>
@@ -33,7 +31,11 @@
     </v-row>
 
     <div class="action-buttons">
-      <v-btn @click="addToCart" color="yellow" class="action-btn add-to-cart-btn">
+      <v-btn
+        @click="addToCart"
+        color="yellow"
+        class="action-btn add-to-cart-btn"
+      >
         ADD TO CART
       </v-btn>
       <v-btn @click="buyNow" color="orange" class="action-btn buy-now-btn">
@@ -54,7 +56,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import { useCartStore } from '../stores/cartStore';
+import { useCartStore } from "../stores/cartStore";
 
 const route = useRoute();
 const router = useRouter();
@@ -88,14 +90,14 @@ const buyNow = () => {
     id: product.value.id,
     title: product.value.title,
     price: product.value.price,
- 
+
     images: product.value.images,
   });
   router.push({ name: "paymentPage" });
 };
 
 const goBack = () => {
-  router.push({ name: 'explorePage' });
+  router.push({ name: "explorePage" });
 };
 
 onMounted(() => {
@@ -142,10 +144,9 @@ onMounted(() => {
 
 .action-buttons {
   display: flex;
-  flex-direction: row; 
+  flex-direction: row;
   gap: 15px;
   margin-top: 20px;
- 
 }
 
 .action-btn {

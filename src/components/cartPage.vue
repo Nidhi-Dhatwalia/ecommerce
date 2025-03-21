@@ -20,12 +20,7 @@
           :key="index"
         >
           <v-card class="product-card" elevation="3">
-            <v-img
-              :src="item.images?.[0]"
-              height="200px"
-              contain
-              class="product-image"
-            />
+           <v-img :src="item.image" height="200px" contain class="product-image" />
 
             <v-card-text>
               <p class="product-name">{{ item.title }}</p>

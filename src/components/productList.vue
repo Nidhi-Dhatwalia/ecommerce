@@ -1,20 +1,23 @@
 <template>
-  <v-container class="container">
-    <h2 class="text-h4 font-weight-bold mb-4">Best Deals</h2>
+  <v-container class="product-container">
+    <h2 class="section-title">Best Deals</h2>
     <v-slide-group show-arrows>
       <v-slide-group-item v-for="(product, index) in bestDeals" :key="index">
-        <v-card class="mx-3 product-card" elevation="2">
-          <v-chip class="best-deal-badge" label small>Best Deal</v-chip>
+        <v-card class="product-card" elevation="2">
+          <v-chip class="deal-badge" label small>Best Deal</v-chip>
           <v-card-text>
             <v-img
-              :src="product.image[0]"
+              :src="product.image"
               height="200px"
               contain
               class="product-image"
-            ></v-img>
-            <p class="product-name">{{ product.title }}</p>
-            <p class="product-price"> Discount : {{ product.discountPercentage }}  %  Off </p>
-            <div class="quantity-selector">
+            />
+
+            <p class="product-title">{{ product.title }}</p>
+            <p class="product-discount">
+              Discount: {{ product.discountPercentage }}% Off
+            </p>
+            <div class="quantity-controls">
               <v-btn
                 icon
                 size="small"
@@ -33,15 +36,15 @@
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </div>
-            
+
             <v-btn
               @click="toggleCart(product, index)"
               block
-              class="add-to-cart"
+              class="add-to-cart-btn"
               :color="product.isInCart ? 'red' : 'black'"
               dark
             >
-              {{ product.isInCart ? 'Added' : 'Add to Cart' }}
+              {{ product.isInCart ? "Added" : "Add to Cart" }}
             </v-btn>
           </v-card-text>
         </v-card>
@@ -50,7 +53,7 @@
 
     <div class="text-center mt-4">
       <router-link to="/explore">
-        <v-btn color="red" class="shop-btn" dark> Explore More </v-btn>
+        <v-btn color="red" class="explore-btn" dark> Explore More </v-btn>
       </router-link>
     </div>
   </v-container>
@@ -63,19 +66,20 @@ import axios from "axios";
 
 const cartStore = useCartStore();
 const bestDeals = ref([]);
- 
+
 const fetchBestDeals = async () => {
   try {
     const response = await axios.get("https://dummyjson.com/products");
+
     bestDeals.value = response.data.products.map((product) => ({
-      id: product.id,   
+      id: product.id,
       title: product.title,
       category: product.category,
-      image: product.images,
+      image: product.images[0],
       price: product.price,
       discountPercentage: product.discountPercentage,
-      quantity: 1, // Default quantity
-      isInCart: cartStore.cart.some(item => item.id === product.id), // Check if product is in cart
+      quantity: 1,
+      isInCart: cartStore.cart.some((item) => item.id === product.id),
     }));
   } catch (error) {
     console.error("Error fetching best deals:", error);
@@ -83,24 +87,21 @@ const fetchBestDeals = async () => {
 };
 
 onMounted(fetchBestDeals);
- 
+
 const toggleCart = (product, index) => {
-  if (!product.isInCart) { 
+  if (!product.isInCart) {
     cartStore.addToCart(product);
-    bestDeals.value[index].isInCart = true; // Mark as added
+    bestDeals.value[index].isInCart = true;
   } else {
-    // Remove the product from the cart
     cartStore.removeFromCart(product);
-    bestDeals.value[index].isInCart = false; // Mark as not added
+    bestDeals.value[index].isInCart = false;
   }
 };
 
- 
 const increaseQuantity = (index) => {
   bestDeals.value[index].quantity++;
 };
 
-// Decrease quantity of the product
 const decreaseQuantity = (index) => {
   if (bestDeals.value[index].quantity > 1) {
     bestDeals.value[index].quantity--;
@@ -109,15 +110,14 @@ const decreaseQuantity = (index) => {
 </script>
 
 <style scoped>
-.container {
+.product-container {
   max-width: 1600px;
-  margin: 10px;
-  padding: 20px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+   padding: 20px;
+  box-shadow: 0 6px 15px rgba(228, 228, 228, 0.5);
   width: 100%;
 }
 
-.text-h4 {
+.section-title {
   font-size: 1.75rem;
   color: #333;
   display: flex;
@@ -139,8 +139,7 @@ const decreaseQuantity = (index) => {
   transform: scale(1.05);
 }
 
- 
-.best-deal-badge {
+.deal-badge {
   position: absolute;
   top: 15px;
   left: 15px;
@@ -150,20 +149,17 @@ const decreaseQuantity = (index) => {
   font-size: 12px;
 }
 
- 
 .product-image {
   border-radius: 10px;
   object-fit: cover;
 }
 
-
-.product-name {
+.product-title {
   font-size: 1.1rem;
   font-weight: 500;
   margin: 10px 0 5px;
   color: #333;
 }
-
 
 .product-category {
   font-size: 0.9rem;
@@ -171,8 +167,7 @@ const decreaseQuantity = (index) => {
   margin-bottom: 5px;
 }
 
-
-.product-price {
+.product-discount {
   display: flex;
   align-items: center;
   font-size: 16px;
@@ -185,8 +180,7 @@ const decreaseQuantity = (index) => {
   margin-left: 5px;
 }
 
-
-.quantity-selector {
+.quantity-controls {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -206,8 +200,7 @@ const decreaseQuantity = (index) => {
   font-size: 1rem;
 }
 
-
-.add-to-cart {
+.add-to-cart-btn {
   background-color: #4caf50;
   color: white;
   font-weight: 600;
@@ -216,20 +209,20 @@ const decreaseQuantity = (index) => {
   transition: background-color 0.3s ease;
 }
 
-.add-to-cart:hover {
+.add-to-cart-btn:hover {
   background-color: #388e3c;
 }
 
-.shop-btn {
+.explore-btn {
   width: 200px;
   font-weight: bold;
-  border-radius: 20px;
+  border-radius: 12px;
   padding: 12px 0;
   text-transform: uppercase;
   font-size: 1rem;
 }
 
-.shop-btn:hover {
+.explore-btn:hover {
   background-color: #ff4081;
 }
 </style>

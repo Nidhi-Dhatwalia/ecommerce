@@ -1,27 +1,27 @@
 <template>
   <v-app>
-    <v-container fluid> 
+    <v-container fluid class="full-width-container"> 
       <v-row class="section-spacing">
-        <v-col  >
+        <v-col>
           <navBar />
         </v-col>
       </v-row>
- 
+
       <v-row class="section-spacing">
-        <v-col cols="12" >
+        <v-col cols="12">
           <homePageBanner />
         </v-col>
-        <v-col cols="12" class="mb-4">
+        <v-col cols="12">
           <productList />
         </v-col>
 
-        <v-col cols="12" class="mb-4">
+        <v-col cols="12">
           <featuresList />
         </v-col>
       </v-row>
- 
+
       <v-row class="section-spacing">
-        <v-col cols="12" class="mb-4">
+        <v-col cols="12">
           <footerInfo />
         </v-col>
       </v-row>
@@ -37,14 +37,14 @@ import featuresList from '../components/featuresList.vue';
 import footerInfo from  '../components/footerInfo.vue';
 </script>
 
-<style scoped>  
- 
- 
-.container { 
-  margin: 0 auto;
-  width: 100%;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);  
+<style scoped>
+.full-width-container {
+  width: 100vw;
+  margin: 0;  
+  padding: 0;  
+} 
+
+.container {
+  width: 100%;  
 }
 </style>
-
- 

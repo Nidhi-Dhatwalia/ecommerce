@@ -13,20 +13,27 @@ export const useCartStore = defineStore('cart', () => {
   }, { deep: true });
 
   const addToCart = (product) => {
-    const existingProduct = cart.value.find((item) => item.title === product.title);
-    if (existingProduct) {
-      existingProduct.quantity += 1;
-    } else { 
-      cart.value.push({ ...product, quantity: 1 });
-    }
-    cart.value = [...cart.value];
-  
-  };
-  
-  const removeFromCart = (index) => {
+  const existingProduct = cart.value.find((item) => item.id === product.id);
+  if (existingProduct) {
+    existingProduct.quantity += 1;
+  } else {
+    cart.value.push({
+      ...product,
+      quantity: 1,
+      image: Array.isArray(product.images) ? product.images[0] : product.image || "",
+   
+    });
+  }
+  cart.value = [...cart.value];  
+};
+
+const removeFromCart = (product) => {
+  const index = cart.value.findIndex((item) => item.id === product.id);
+  if (index !== -1) {
     cart.value.splice(index, 1);
-    cart.value = [...cart.value];   
-  };
+  }
+};
+
   
 
   const clearCart = () => { 

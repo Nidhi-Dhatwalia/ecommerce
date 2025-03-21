@@ -38,13 +38,12 @@
       >
         <v-card class="product-card" elevation="5">
           <v-img
-            :src="product.images[0]"
+            :src="product.image"
             height="200px"
             contain
-            alt="Product Image"
             class="product-image"
           />
-         
+
           <v-card-text class="product-card-text">
             <p class="product-name">{{ product.title }}</p>
             <p class="product-category">{{ product.category }}</p>
@@ -60,13 +59,14 @@
               </v-btn>
             </router-link>
 
-            <v-btn
-              class="add-to-cart-button"
-              :color="isProductInCart(product) ? 'red' : 'secondary'"
-              @click="addToCart(product)"
-            >
-              Add to Cart
-            </v-btn>
+           <v-btn
+  class="add-to-cart-button"
+  :color="product.isInCart ? 'red' : 'secondary'"
+  @click="addToCart(product)"
+>
+  {{ product.isInCart ? "Added" : "Add to Cart" }}
+</v-btn>
+
           </v-card-text>
         </v-card>
       </v-col>
@@ -110,12 +110,14 @@ const fetchBestDeals = async (category = "") => {
     const response = await axios.get(
       `https://dummyjson.com/products${category ? `/category/${category}` : ""}`
     );
+
     bestDeals.value = response.data.products.map((product) => ({
       title: product.title,
       category: product.category,
-      images: product.images,
+      image: product.images[0],
       price: product.price,
       id: product.id,
+       isInCart: cartStore.cart.some(item => item.id === product.id),
     }));
   } catch (error) {
     console.error("Error fetching best deals:", error);
@@ -139,12 +141,16 @@ const isProductInCart = (product) => {
   return cartStore.cart.some((item) => item.id === product.id);
 };
 
- 
 const addToCart = (product) => {
   if (!isProductInCart(product)) {
-    cartStore.addToCart(product);  
+    cartStore.addToCart(product);
+    product.isInCart = true;   
+  } else {
+    cartStore.removeFromCart(product);  
+    product.isInCart = false;  
   }
 };
+
 
 onMounted(() => {
   fetchBestDeals();

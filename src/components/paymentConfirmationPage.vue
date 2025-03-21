@@ -8,14 +8,18 @@
       <p><strong>Tracking Number:</strong> {{ trackingNumber }}</p>
     </div>
 
-    <router-link to="/">Go to Home</router-link>
+    <router-link to="/dashboard" class="home-link">Go to Home</router-link>
   </div>
 </template>
 
+<script setup>
  
+const productName =  'Unknown Product';
+const productPrice =   0;
+const trackingNumber =  'Not Available';
+</script>
 
 <style scoped>
-
 .confirmation-container {
   padding: 40px;
   max-width: 600px;
@@ -36,7 +40,7 @@
   margin: 10px 0;
 }
 
-.router-link {
+.home-link {
   margin-top: 20px;
   color: #5469d4;
   text-decoration: underline;
