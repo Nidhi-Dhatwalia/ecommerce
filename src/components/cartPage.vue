@@ -20,7 +20,12 @@
           :key="index"
         >
           <v-card class="product-card" elevation="3">
-           <v-img :src="item.image" height="200px" contain class="product-image" />
+            <v-img
+              :src="item.image"
+              height="200px"
+              contain
+              class="product-image"
+            />
 
             <v-card-text>
               <p class="product-name">{{ item.title }}</p>
@@ -88,13 +93,6 @@ import { computed, watch } from "vue";
 const cartStore = useCartStore();
 const cart = computed(() => cartStore.cart);
 
-watch(
-  cart,
-  (newCart) => {
-    console.log("Cart has been updated in the first component", newCart);
-  },
-  { deep: true }
-);
 
 const removeFromCart = (product) => {
   cartStore.removeFromCart(product);

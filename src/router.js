@@ -12,15 +12,21 @@ const routes = [
   {
     path: '/',
     name: 'loginPage',
-    component: loginPage,
-    meta: { requiresAuth: false }
+    component: loginPage, 
+    beforeEnter: (to, from, next) => { 
+      if (localStorage.getItem('authToken')) {
+        next({ name: 'managePages' }); 
+      } else {
+        next();  
+      }
+    },
   },
   {
     path: '/dashboard',
-    name: 'managePages',
+    name: 'managePages',  
     component: managePages,
-    meta: { requiresAuth: true }
   },
+  
   {
     path: '/cart',
     name: 'cartPage',

@@ -59,14 +59,13 @@
               </v-btn>
             </router-link>
 
-           <v-btn
-  class="add-to-cart-button"
-  :color="product.isInCart ? 'red' : 'secondary'"
-  @click="addToCart(product)"
->
-  {{ product.isInCart ? "Added" : "Add to Cart" }}
-</v-btn>
-
+            <v-btn
+              class="add-to-cart-button"
+              :color="product.isInCart ? 'red' : 'secondary'"
+              @click="addToCart(product)"
+            >
+              {{ product.isInCart ? "Added" : "Add to Cart" }}
+            </v-btn>
           </v-card-text>
         </v-card>
       </v-col>
@@ -117,7 +116,7 @@ const fetchBestDeals = async (category = "") => {
       image: product.images[0],
       price: product.price,
       id: product.id,
-       isInCart: cartStore.cart.some(item => item.id === product.id),
+      isInCart: cartStore.cart.some((item) => item.id === product.id),
     }));
   } catch (error) {
     console.error("Error fetching best deals:", error);
@@ -144,13 +143,12 @@ const isProductInCart = (product) => {
 const addToCart = (product) => {
   if (!isProductInCart(product)) {
     cartStore.addToCart(product);
-    product.isInCart = true;   
+    product.isInCart = true;
   } else {
-    cartStore.removeFromCart(product);  
-    product.isInCart = false;  
+    cartStore.removeFromCart(product);
+    product.isInCart = false;
   }
 };
-
 
 onMounted(() => {
   fetchBestDeals();
