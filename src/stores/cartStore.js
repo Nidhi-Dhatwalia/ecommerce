@@ -3,6 +3,8 @@ import { ref, watch } from 'vue';
 
 export const useCartStore = defineStore('cart', () => {
   const cart = ref([]);
+
+  
   const storedCart = localStorage.getItem('cart');
   if (storedCart) {
     cart.value = JSON.parse(storedCart);

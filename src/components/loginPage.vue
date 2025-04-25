@@ -52,7 +52,6 @@ export default {
  
     if (data && data.accessToken) { 
       localStorage.setItem('authToken', data.accessToken); 
-      console.log('Token stored:', localStorage.getItem('authToken'));
  
       console.log('Redirecting to managePages...');
       this.$router.push({ name: 'managePages' });
