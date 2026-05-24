@@ -1,79 +1,110 @@
 <template>
-  <v-container class="container">
-    <h2 class="heading">
-      Best Deals
-      <v-btn icon @click="showFilterMenu = !showFilterMenu" class="icon-btn">
-        <v-icon>mdi-filter</v-icon>
-      </v-btn>
-
-      <router-link to="/dashboard" class="back-btn-link">
-        <v-btn color="primary"> <v-icon>mdi-arrow-left</v-icon> Back </v-btn>
+  <v-container class="explore-container">
+    <div class="explore-header">
+      <div>
+        <h2 class="explore-title">Explore Best Deals</h2>
+        <p class="explore-subtitle">Discover premium products across all categories.</p>
+      </div>
+      <router-link to="/dashboard" class="back-link">
+        <v-btn variant="outlined" color="primary" class="back-btn rounded-pill px-6">
+          <v-icon left>mdi-arrow-left</v-icon> Back to Home
+        </v-btn>
       </router-link>
-    </h2>
+    </div>
 
-    <v-list v-if="showFilterMenu" class="filter-list">
-      <v-list-item
-        v-for="(category, index) in categories"
-        :key="index"
-        @click="selectCategory(category)"
-        class="filter-item"
-      >
-        <v-list-item-title>{{ category }}</v-list-item-title>
-      </v-list-item>
-    </v-list>
+    <!-- Category Filter Chips -->
+    <div class="category-filters mb-8">
+      <v-slide-group show-arrows>
+        <v-slide-group-item>
+           <v-chip 
+              class="category-chip ma-2"
+              :color="selectedCategory === '' ? 'primary' : 'default'"
+              :variant="selectedCategory === '' ? 'flat' : 'outlined'"
+              @click="selectCategory('')"
+              size="large"
+            >
+              All Products
+            </v-chip>
+        </v-slide-group-item>
+        <v-slide-group-item
+          v-for="(category, index) in categories"
+          :key="index"
+        >
+          <v-chip
+            class="category-chip ma-2 text-capitalize"
+            :color="selectedCategory === category ? 'primary' : 'default'"
+            :variant="selectedCategory === category ? 'flat' : 'outlined'"
+            @click="selectCategory(category)"
+            size="large"
+          >
+            {{ category.replace('-', ' ') }}
+          </v-chip>
+        </v-slide-group-item>
+      </v-slide-group>
+    </div>
 
-    <v-progress-circular
-      v-if="loading"
-      indeterminate
-      color="blue"
-      size="64"
-      class="loading-spinner"
-    ></v-progress-circular>
+    <!-- Loading State -->
+    <div v-if="loading" class="d-flex justify-center align-center py-12">
+      <v-progress-circular indeterminate color="primary" size="64" width="4"></v-progress-circular>
+    </div>
 
-    <v-row v-if="bestDeals.length > 0" class="product-grid">
+    <!-- Product Grid -->
+    <v-row v-else-if="bestDeals.length > 0" class="product-grid">
       <v-col
         v-for="(product, index) in bestDeals"
         :key="index"
-        class="product-col"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
       >
-        <v-card class="product-card" elevation="5">
-          <v-img
-            :src="product.image"
-            height="200px"
-            contain
-            class="product-image"
-          />
-
-          <v-card-text class="product-card-text">
-            <p class="product-name">{{ product.title }}</p>
-            <p class="product-category">{{ product.category }}</p>
+        <v-card class="explore-card hover-lift" elevation="0">
+          <div class="image-wrapper">
+            <v-img :src="product.image" height="220" cover class="product-img"></v-img>
+          </div>
+          
+          <v-card-text class="d-flex flex-column card-content">
+            <p class="product-category text-uppercase">{{ product.category.replace('-', ' ') }}</p>
+            <h3 class="product-name text-truncate">{{ product.title }}</h3>
             <p class="product-price">${{ product.price }}</p>
-
-            <router-link :to="'/product/' + product.id">
+            
+            <v-spacer></v-spacer>
+            
+            <div class="action-buttons mt-4">
               <v-btn
+                variant="flat"
                 color="primary"
-                class="visit-button"
+                class="visit-btn"
+                block
                 @click="visitProduct(product.id)"
               >
-                Visit Item
+                View Details
               </v-btn>
-            </router-link>
-
-            <v-btn
-              class="add-to-cart-button"
-              :color="product.isInCart ? 'red' : 'secondary'"
-              @click="addToCart(product)"
-            >
-              {{ product.isInCart ? "Added" : "Add to Cart" }}
-            </v-btn>
+              
+              <v-btn
+                variant="flat"
+                :color="product.isInCart ? 'success' : 'grey-darken-3'"
+                class="add-btn mt-2"
+                block
+                @click="addToCart(product)"
+              >
+                <v-icon left v-if="product.isInCart">mdi-check</v-icon>
+                {{ product.isInCart ? "In Cart" : "Add to Cart" }}
+              </v-btn>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <div v-if="bestDeals.length === 0 && !loading" class="no-products">
-      <p>No products found for this category.</p>
-      <v-btn color="primary" @click="fetchBestDeals()">Reload</v-btn>
+    <!-- Empty State -->
+    <div v-else-if="!loading" class="empty-state py-12">
+      <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-package-variant-closed</v-icon>
+      <h3 class="empty-title">No products found</h3>
+      <p class="empty-subtitle">We couldn't find any products in this category.</p>
+      <v-btn color="primary" variant="outlined" @click="fetchBestDeals('')" class="mt-4 rounded-pill">
+        Clear Filters
+      </v-btn>
     </div>
   </v-container>
 </template>
@@ -85,7 +116,6 @@ import axios from "axios";
 import { useCartStore } from "../stores/cartStore";
 
 const router = useRouter();
-const showFilterMenu = ref(false);
 const selectedCategory = ref("");
 const loading = ref(false);
 const bestDeals = ref([]);
@@ -105,9 +135,10 @@ const cartStore = useCartStore();
 
 const fetchBestDeals = async (category = "") => {
   loading.value = true;
+  selectedCategory.value = category;
   try {
     const response = await axios.get(
-      `https://dummyjson.com/products${category ? `/category/${category}` : ""}`
+      `https://dummyjson.com/products${category ? \`/category/\${category}\` : ""}`
     );
 
     bestDeals.value = response.data.products.map((product) => ({
@@ -127,13 +158,11 @@ const fetchBestDeals = async (category = "") => {
 };
 
 const selectCategory = (category) => {
-  selectedCategory.value = category;
-  showFilterMenu.value = false;
   fetchBestDeals(category);
 };
 
 const visitProduct = (productId) => {
-  router.push(`/product-detail/${productId}`);
+  router.push(`/product/${productId}`);
 };
 
 const isProductInCart = (product) => {
@@ -143,10 +172,12 @@ const isProductInCart = (product) => {
 const addToCart = (product) => {
   if (!isProductInCart(product)) {
     cartStore.addToCart(product);
-    product.isInCart = true;
+    const item = bestDeals.value.find(p => p.id === product.id);
+    if (item) item.isInCart = true;
   } else {
     cartStore.removeFromCart(product);
-    product.isInCart = false;
+    const item = bestDeals.value.find(p => p.id === product.id);
+    if (item) item.isInCart = false;
   }
 };
 
@@ -156,132 +187,143 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
-  max-width: 1600px;
-  margin: 50px auto;
-  padding: 30px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  border-radius: 8px;
-  width: 90%;
+.explore-container {
+  max-width: 1400px;
+  padding: 40px 20px;
 }
 
-.heading {
-  color: #333;
-  font-weight: 600;
+.explore-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 20px;
 }
 
-.icon-btn {
-  margin-left: 10px;
-  color: #5469d4;
+.explore-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
 }
 
-.back-btn-link {
+.explore-subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.back-link {
   text-decoration: none;
 }
 
-.filter-list {
-  background-color: #fafafa;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.back-btn {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.category-chip {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.category-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.explore-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.05);
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.explore-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08) !important;
+}
+
+.image-wrapper {
+  background: #f3f4f6;
+  padding: 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.product-img {
+  mix-blend-mode: multiply;
   border-radius: 8px;
-  padding: 10px;
-  margin-top: 20px;
 }
 
-.filter-item {
-  cursor: pointer;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.filter-item:hover {
-  background-color: #f1f1f1;
-}
-
-.product-grid {
-  margin-top: 30px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-.product-col {
-  padding: 15px;
-}
-
-.product-card {
-  padding: 10px;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-.product-card:hover {
-  transform: translateY(-10px);
-}
-
-.product-image {
-  border-radius: 8px;
-}
-
-.product-card-text {
-  padding: 15px;
-  text-align: center;
-}
-
-.product-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
+.card-content {
+  flex-grow: 1;
+  padding: 20px;
 }
 
 .product-category {
-  font-size: 0.9rem;
-  color: #777;
-  margin: 5px 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6366f1;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+}
+
+.product-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
 }
 
 .product-price {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin: 10px 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
 }
 
-.visit-button,
-.add-to-cart-button {
+.action-buttons {
   width: 100%;
-  margin-top: 10px;
 }
 
-.visit-button:hover {
-  background-color: #4353b3;
+.visit-btn, .add-btn {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  border-radius: 8px;
+  height: 44px;
 }
 
-.add-to-cart-button {
-  background-color: #f39c12;
-  color: white;
-}
-
-.add-to-cart-button:hover {
-  background-color: #e67e22;
-}
-
-.loading-spinner {
-  display: block;
-  margin: 30px auto;
-}
-
-.no-products {
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  margin-top: 30px;
-  color: #555;
+  background: white;
+  border-radius: 16px;
+  border: 1px dashed rgba(0,0,0,0.1);
 }
 
-.no-products v-btn {
-  margin-top: 15px;
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.empty-subtitle {
+  color: #6b7280;
+  margin: 0;
 }
 </style>
